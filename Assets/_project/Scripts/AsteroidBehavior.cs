@@ -30,6 +30,12 @@ public class AsteroidBehavior : MonoBehaviour
     {
         if (other.CompareTag("Spaceship"))
         {
+            SpaceshipLogic spaceshipLogic = other.GetComponent<SpaceshipLogic>();
+            if (spaceshipLogic != null)
+            {
+                spaceshipLogic.TakeDamage(1);
+            }
+
             Destroy(gameObject);
         }
     }

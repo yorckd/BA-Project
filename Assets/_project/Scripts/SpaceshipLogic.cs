@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SpaceshipLogic : MonoBehaviour
 {
-    public int maxHealth = 10;
-    public int currentHealth;
+    public int maxHealth;
+    private int currentHealth;
 
     public HealthBar healthBar;
 
@@ -15,8 +16,14 @@ public class SpaceshipLogic : MonoBehaviour
         currentHealth = maxHealth;
     }
 
-    void Update()
+    public void TakeDamage(int damage)
     {
+        currentHealth -= damage;
+        healthBar.SetHealth(currentHealth);
         
+        if (currentHealth <= 0)
+        {
+            SceneManager.LoadScene("GameOver");
+        }
     }
 }
