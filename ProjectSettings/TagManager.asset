@@ -6,11 +6,27 @@ TagManager:
   tags:
   - Spaceship
   - Asteroid
+  - DataReceiver
+  - Enemy
+  - friendlyMissile
+  - AsteroidAimableBarrier
+  - enemyMissile
+  - ModeManager
+  - ReceiverSpaceship
+  - ReceiverCrosshair
+  - Crosshair
+  - SkeletonPilot
+  - SkeletonGunner
+  - CanvasPilot
+  - CanvasGunner
+  - ScoreManager
+  - SkeletonRaw
+  - HealthKit
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - crosshair aimable
   - Water
   - UI
   - 

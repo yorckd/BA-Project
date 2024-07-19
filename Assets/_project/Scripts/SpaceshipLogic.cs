@@ -1,29 +1,53 @@
-using System.Collections;
-using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class SpaceshipLogic : MonoBehaviour
+public class SpaceshipLogic : NetworkBehaviour
 {
     public int maxHealth;
-    private int currentHealth;
+    private NetworkVariable<int> currentHealth = new NetworkVariable<int>(0);
 
-    public HealthBar healthBar;
+    HealthBar healthBar;
 
-    void Start()
+    private void Start()
     {
-        healthBar.SetMaxHealth(maxHealth);
-        currentHealth = maxHealth;
+        healthBar = GameObject.Find("HealthBar").GetComponent<HealthBar>();
+        if (IsHost)
+        {
+            healthBar.SetMaxHealth(maxHealth);
+            currentHealth.Value = maxHealth;
+        }
     }
 
     public void TakeDamage(int damage)
     {
-        currentHealth -= damage;
-        healthBar.SetHealth(currentHealth);
-        
-        if (currentHealth <= 0)
+        if (IsHost)
         {
-            SceneManager.LoadScene("GameOver");
+            currentHealth.Value -= damage;
+
+            healthBar.SetHealth(currentHealth.Value);
+            UpdateScoreClientRpc(currentHealth.Value);
+
+            if (currentHealth.Value <= 0)
+            {
+                NetworkManager.Singleton.SceneManager.LoadScene("GameOver", LoadSceneMode.Single); ;
+            }
         }
+    }
+
+    [ClientRpc]
+    private void UpdateScoreClientRpc(int value)
+    {
+        healthBar.SetHealth(value);
+    }
+
+    public bool IsDamaged()
+    {
+        if (currentHealth.Value < maxHealth)
+        {
+            return true;
+        }
+
+        return false;
     }
 }

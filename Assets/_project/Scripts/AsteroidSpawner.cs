@@ -1,6 +1,7 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public class AsteroidSpawner : MonoBehaviour
+public class AsteroidSpawner : NetworkBehaviour
 {
     public GameObject asteroidPrefab;
     public float minSpawnInterval;
@@ -12,15 +13,15 @@ public class AsteroidSpawner : MonoBehaviour
 
     private void Start()
     {
-        nextSpawnTime = GetNextSpawnTime();
+        GenerateNextSpawnTime();
     }
 
     private void Update()
     {
-        if (Time.time >= nextSpawnTime)
+        if (IsServer && Time.time >= nextSpawnTime)
         {
             SpawnPrefab();
-            nextSpawnTime = GetNextSpawnTime();
+            GenerateNextSpawnTime();
         }
     }
 
@@ -30,6 +31,12 @@ public class AsteroidSpawner : MonoBehaviour
         Vector3 targetPosition = new(spawnPosition.x, spawnPosition.y, -20f);
         GameObject newAsteroid = Instantiate(asteroidPrefab, spawnPosition, Quaternion.identity);
 
+        NetworkObject networkObject = newAsteroid.GetComponent<NetworkObject>();
+        if (networkObject != null)
+        {
+            networkObject.Spawn(true);
+        }
+
         AsteroidBehavior prefabMovement = newAsteroid.GetComponent<AsteroidBehavior>();
         if (prefabMovement != null)
         {
@@ -37,8 +44,8 @@ public class AsteroidSpawner : MonoBehaviour
         }
     }
 
-    private float GetNextSpawnTime()
+    private void GenerateNextSpawnTime()
     {
-        return Time.time + Random.Range(minSpawnInterval, maxSpawnInterval);
+        nextSpawnTime = Time.time + Random.Range(minSpawnInterval, maxSpawnInterval);
     }
 }
